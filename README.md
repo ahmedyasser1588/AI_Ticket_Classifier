@@ -8,7 +8,7 @@ sdk_version: "4.44.0"
 app_file: app.py
 pinned: false
 license: mit
-short_description: Intelligent Customer Support Triage & Structured Information Extraction
+short_description: Support ticket classifier with structured output
 ---
 
 <div align="center">
