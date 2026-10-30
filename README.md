@@ -20,7 +20,7 @@ Turn unstructured customer messages into structured, actionable support tickets.
 Built with **Python**, **Groq**, **Llama 3.1**, **Pydantic v2**, and **Gradio**.
 
 <p align="center">
-  <a href="https://huggingface.co/spaces/ahmedyasser1588/ticket-classifier">
+  <a href="https://huggingface.co/spaces/Ahmed1022/ticket-classifier">
     <img src="https://img.shields.io/badge/Live%20Demo-Hugging%20Face-yellow?style=for-the-badge&logo=huggingface" alt="Live Demo"/>
   </a>
   <a href="https://github.com/ahmedyasser1588/AI_Ticket_Classifier">
@@ -61,7 +61,7 @@ The project combines LLM inference with software engineering practices, includin
 ## 🚀 Live Demo
 
 Try the deployed application:  
-👉 **[Launch AutoTicket AI on Hugging Face Spaces](https://huggingface.co/spaces/ahmedyasser1588/ticket-classifier)**
+👉 **[Launch AutoTicket AI on Hugging Face Spaces](https://huggingface.co/spaces/Ahmed1022/ticket-classifier)**
 
 Enter a customer message and inspect the resulting classification and structured output.
 
