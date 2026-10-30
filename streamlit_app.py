@@ -19,7 +19,7 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 api_key = st.secrets.get("LLM_api_key", os.getenv("LLM_api_key", ""))
 base_url = st.secrets.get("LLM_base_url", os.getenv("LLM_base_url", "https://api.groq.com/openai/v1"))
-model = st.secrets.get("LLM_Model", os.getenv("LLM_Model", "llama-3.1-8b-instant"))
+model = st.secrets.get("LLM_Model", os.getenv("LLM_Model", "llama-3.3-70b-versatile"))
 
 # ---------------------------------------------------------------------------
 # Header
