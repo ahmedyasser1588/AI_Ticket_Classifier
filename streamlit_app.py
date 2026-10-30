@@ -36,8 +36,6 @@ with st.sidebar:
         "Select Language Model:",
         [
             "qwen/qwen3.8-27b",
-            "openai/gpt-oss-20b",
-            "openai/gpt-oss-120b",
             "allam-2-7b"
         ],
         index=0
@@ -89,7 +87,7 @@ if classify_btn:
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.0,
-                    max_tokens=200
+                    max_tokens=512
                 )
                 
                 raw_output = response.choices[0].message.content
