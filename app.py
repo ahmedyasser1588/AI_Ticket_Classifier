@@ -31,7 +31,7 @@ except ImportError:
     pass  # dotenv not required on HuggingFace Spaces
 
 API_KEY  = os.getenv("LLM_api_key", "")
-BASE_URL = os.getenv("LLM_base_url", "https://api.groq.com/openai/v1")
+BASE_URL = "https://api.groq.com/openai/v1"
 MODEL    = "llama-3.3-70b-versatile"
 
 # ---------------------------------------------------------------------------
