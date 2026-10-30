@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خريطة مشروع Ticket Classifier</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.8}
+  header{background:linear-gradient(135deg,#6366f1,#8b5cf6,#d946ef);padding:50px 20px;text-align:center}
+  header h1{font-size:2.2rem;color:#fff}
+  header p{color:#f3e8ff;margin-top:10px}
+  main{max-width:1000px;margin:auto;padding:25px}
+  section{background:#1e293b;border-radius:14px;padding:25px;margin:20px 0;border:1px solid #334155}
+  h2{color:#a5b4fc;border-bottom:2px solid #6366f1;padding-bottom:8px;margin-bottom:15px}
+  h3{color:#fbbf24;margin:15px 0 8px}
+  code{background:#0f172a;color:#6ee7b7;padding:2px 8px;border-radius:6px;font-family:Consolas,monospace;font-size:.9em}
+  pre{background:#0f172a;color:#6ee7b7;padding:15px;border-radius:10px;overflow-x:auto;direction:ltr;text-align:left;font-size:.85em}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{border:1px solid #334155;padding:10px;text-align:right}
+  th{background:#334155;color:#a5b4fc}
+  .ok{color:#4ade80}.warn{color:#fbbf24}.bad{color:#f87171}
+  .badge{display:inline-block;padding:2px 12px;border-radius:20px;font-size:.8em;font-weight:bold}
+  .b-ok{background:#14532d;color:#4ade80}.b-warn{background:#713f12;color:#fbbf24}.b-bad{background:#7f1d1d;color:#f87171}.b-info{background:#1e3a8a;color:#93c5fd}
+  .pipeline{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:15px 0}
+  .pipeline div{background:#312e81;color:#c7d2fe;padding:8px 14px;border-radius:10px;font-weight:bold}
+  .pipeline span{color:#818cf8;align-self:center}
+  ul{padding-right:22px}
+  .card{background:#0f172a;border-radius:10px;padding:15px;margin:10px 0;border-right:4px solid #6366f1}
+</style>
+</head>
+<body>
+<header>
+  <h1>🗺️ خريطة مشروع Ticket Classifier</h1>
+  <p>دليل شامل لفهم المشروع: بنيته، تدفقه، حالته الحالية، وتقييمه</p>
+</header>
+<main>
+
+<section>
+<h2>1. إيه هو المشروع ده؟</h2>
+<p>ده مشروع تصنيف <b>تذاكر الدعم الفني (Support Tickets)</b> باستخدام LLM. العميل بيبعت رسالة شكوى/طلب، والموديل بيطلعلك JSON منظم فيه:</p>
+<ul>
+<li><b>category</b> (الفئة): technical / account / delivery / billing / subscription</li>
+<li><b>sentiment</b> (المشاعر): positive / negative / neutral</li>
+<li><b>urgency</b> (الأولوية): low / medium / high</li>
+<li><b>summary</b> (ملخص قصير)</li>
+</ul>
+<p>المشروع جزء من كورس DEPI Agentic، وبيعلّم مفاهيم أساسية: Structured Generation, Prompt Engineering, Evaluation, Inference من الصفر.</p>
+</section>
+
+<section>
+<h2>2. خريطة المجلدات</h2>
+<pre>
+ME/
+├── .env                     # إعدادات: اسم الموديل + مسار الداتا
+├── requirements.txt         # المكتبات المطلوبة
+├── PROJECT_LEARNING_GUIDE.md# شرح تفصيلي (94KB!) مشروح فيه كله
+├── Data/tickets.csv         # الداتا: 10 تذاكر بس (ticket_id, message, category, sentiment, urgency)
+├── prompts/
+│   └── classifier_prompt.py # بيبني الـ prompt (تعليمات + تعريفات + أمثلة Few-shot)
+├── LLM/
+│   ├── api.py               # كلاس LLM بسيط بيكلم OpenAI-compatible API
+│   ├── base.py              # Abstract class للـ LLM
+│   ├── config.py            # إعدادات من env عبر pydantic-settings
+│   ├── openai.py            # OpenAiCompatible: generate() بياخد GenerationRequest
+│   └── Model.py             # فاضي! بس openai.py بيستورد منه GenerationRequest ← مكسر
+├── structured/
+│   ├── schema.py            # TicketSchema (pydantic) بتحدد شكل الـ JSON المطلوب
+│   ├── parser.py            # parser_and_validate_ticket: json.loads + validation
+│   ├── generator.py         # StructuredGeneration: بيتغلف outlines
+│   └── outline_adapter.py   # بيوصل outlines بالـ transformers model
+├── src/inference/           # تنفيذ الـ inference "يدوي" من الصفر
+│   ├── model.py             # load_model(): يحمل Qwen2.5-1.5B-Instruct
+│   ├── tokenizer.py         # tokenize()
+│   ├── decoder.py           # temperature / top-k / top-p / logit bias / اختيار التوكن
+│   ├── generate.py          # الحلقة الأساسية للتوليد autoregressive
+│   ├── stopping.py          # StopSequenceDetector
+│   └── config.py            # بيقرأ .env وبيطبع اسم الموديل عند الاستيراد
+├── evaluation/
+│   ├── evaluator.py         # TicketEvaluator: prompt → generate → parse → قارن بالصح
+│   ├── metrics.py           # validity_rate, accuracy لكل حقل, overall success...
+│   └── models.py            # EvaluationModel (pydantic)
+├── tests/
+│   ├── test.py              # سكربت تجربة end-to-end على تذكرة واحدة
+│   ├── reliability.py       # تجربة baseline prompt على الداتا
+│   └── test_evaluation.py   # فاضي حاليًا
+└── notebooks/               # نوت بوكات تجارب (API, evaluation, model...)
+</pre>
+</section>
+
+<section>
+<h2>3. خط سير المشروع (Pipeline)</h2>
+<div class="pipeline">
+  <div>ticket message</div><span>⬅</span>
+  <div>prompt builder</div><span>⬅</span>
+  <div>model</div><span>⬅</span>
+  <div>structured output</div><span>⬅</span>
+  <div>parser + validation</div><span>⬅</span>
+  <div>compare with truth</div><span>⬅</span>
+  <div>metrics</div>
+</div>
+<p>ولو بتعيد التنفيذ: الموديل الحالي هو <code>Qwen/Qwen2.5-1.5B-Instruct</code> من HuggingFace، والتوليد بيمشي عن طريق "outlines" اللي بتجبر الموديل يطلع JSON مطابق للـ schema.</p>
+</section>
+
+<section>
+<h2>4. شرح كل موديول باختصار</h2>
+
+<div class="card"><h3>📝 prompts/classifier_prompt.py</h3>
+<p>الدالة <code>build_ticket_classifier()</code> بترجع prompt فيه: دور الموديل، تعريف كل فئة، أمثلة few-shot، وبعدين التذكرة المطلوب تصنيفها. دي نقطة قوة — الـ prompt متعرف كويس.</p></div>
+
+<div class="card"><h3>🏗️ structured/</h3>
+<p><code>schema.py</code> بيحدد الشكل بـ pydantic + Literal types. <code>generator.py</code> + <code>outline_adapter.py</code> بيوصلوا الموديل بمكتبة <b>outlines</b> اللي بتعمل constrained decoding (الموديل مش هيقدر يطلع JSON غلط). <code>parser.py</code> بيحلل وبيتأكد.</p></div>
+
+<div class="card"><h3>⚙️ src/inference/</h3>
+<p>ده "من الصفر": بتحمّل الموديل والـ tokenizer، وبتعمل الحلقة بنفسك — tokenize، لفّ على max_new_token، طبّق temperature/top-k/top-p/logit bias، اختار التوكن، وقف عند EOS أو stop sequence. معمول للتعليم أكتر من الاستخدام العملي.</p></div>
+
+<div class="card"><h3>📊 evaluation/</h3>
+<p><code>TicketEvaluator</code> بياخد كل صف في الداتا، يجيب prompt، يولد، يبارس، ويقارن بالنتيجة الصح، ويخزن النتيجة في <code>EvaluationModel</code> حتى لو فشلت (مع رسالة error مفصلة). وبعدين <code>metrics.py</code> بيحسب: validity rate, category/sentiment/urgency accuracy, overall success rate, failure count.</p></div>
+
+<div class="card"><h3>🔌 LLM/</h3>
+<p>محاولات لكتابة abstractions للـ LLM. <code>config.py</code> بيقرا api_key/base_url/model من env. <code>openai.py</code> كلاس OpenAiCompatible. <span class="warn">فيه مشاكل (تحت)</span>.</p></div>
+</section>
+
+<section>
+<h2>5. التقييم — أنا شايفه إزاي؟ ⭐</h2>
+
+<h3>✅ نقاط قوة</h3>
+<ul>
+<li>فكرة المشروع واضحة ومتكاملة: data → prompt → structured generation → parsing → evaluation.</li>
+<li>تقسيمات ملفات منطقية (prompts / structured / evaluation / inference).</li>
+<li>استخدام pydantic + Literal للـ schema حاجة ممتازة.</li>
+<li>الـ evaluator بيفصل "الـ success/failure" عن "الـ correctness" — مفهوم صح ومتقدم.</li>
+<li>وجود ملف <code>PROJECT_LEARNING_GUIDE.md</code> توثيق ضخم — ده عبقري للدراسة.</li>
+<li>تجربة الـ inference من الصفر بـ temperature/top-k/top-p — فهم عميق.</li>
+</ul>
+
+<h3>⚠️ نقاط ضعف ومشاكل حاليا</h3>
+<ul>
+<li><span class="bad">🔴 استيرادات مكسورة (imports):</span> ملفات كتير بتستخدم <code>from base import</code>، <code>from schema import</code>، <code>from models import</code>، <code>from src...</code> بدل relative imports — ده ممكن يخلي التشغيل يغلط حسب المكان اللي انت فيه.</li>
+<li><code>LLM/Model.py</code> فاضي بس <code>openai.py</code> بيستورد منه <code>GenerationRequest</code> ← هيفتحش.</li>
+<li><code>structured/parser.py</code> بيستورد <code>from schema import TicketSchema</code> — لازم تكون <code>from .schema</code> أو <code>from structured.schema</code>.</li>
+<li><code>evaluation/evaluator.py</code> بيستخدم <code>from models import</code> بدل <code>from .models</code>.</li>
+<li><code>src/inference/config.py</code> بيطبع اسم الموديل عند الاستيراد (side effect مش حلو).</li>
+<li>الداتا صغيرة جدًا (10 صفوف) — التقييم مش هيكون موثوق.</li>
+<li><code>tests/test_evaluation.py</code> فاضي، ومفيش unit tests حقيقية (pytest موجود بس الملفات فاضية/سكربتات).</li>
+<li><code>LLM/api.py</code> بيستخدم <code>client.responses.create</code> و<code>res.output_text</code> — ده API تجريبي ممكن متكونش مدعومة في كل الإصدارات.</li>
+<li><code>tests/test.py</code> بيستورد <code>from Src.inference...</code> و<code>from Structured...</code> (case غلط) كـ fallback — مش شغالة على Linux (لكن إحنا على Windows case-insensitive عشان كده بتشتغل).</li>
+<li><code>LLM/config.py</code> بيتوقع env vars اسمها <code>api_key</code>, <code>base_url</code>, <code>model</code> بس <code>.env</code> فيه <code>Model</code> و<code>DataSet</code> بس ← مش متطابق.</li>
+</ul>
+
+<h3>🎯 تقييم عام</h3>
+<p>المشروع <b>فكرة ممتازة وهيكل كويس جدًا</b> للمبتدئين في LLM engineering، وبيعلم مفاهيم محترمة (structured output, evaluation, inference من الصفر). لكنه <b>مش متكامل/مش شغال 100%</b> بسبب مشاكل الاستيراد والملفات الفاضية وعدم تطابق الـ env. تقييم من 5: <b>3.5/5 للتعليم، 2/5 للاستخدام العملي حاليًا.</b></p>
+</section>
+
+<section>
+<h2>6. نصايح لإصلاح وترتيب المشروع</h2>
+<ol>
+<li>وحّد الاستيرادات: استخدم relative imports جوا كل package (<code>from .schema import</code>، <code>from .models import</code>) أو خلي <code>ME</code> هو الـ package root.</li>
+<li>املأ <code>LLM/Model.py</code> بتعريف <code>GenerationRequest</code> و<code>Message</code> اللي <code>openai.py</code> متوقعهم — أو احذف <code>openai.py</code> لو مش محتاجه.</li>
+<li>وحّد أسماء env vars بين <code>.env</code> و<code>LLM/config.py</code> و<code>src/inference/config.py</code>.</li>
+<li>شيل الـ <code>print</code> على مستوى الـ import في <code>src/inference/config.py</code>.</li>
+<li>زوّد الداتا (استخدم dataset تذاكر حقيقي زي customer_support_tickets) وادّيها splits train/test.</li>
+<li>اكتب unit tests حقيقية في <code>tests/</code> لـ parser و metrics والـ decoder functions — واستخدم pytest فعلاً (موجود في .pytest_cache).</li>
+<li>املأ <code>tests/test_evaluation.py</code> بتجربة حقيقية للـ evaluator على subset صغير.</li>
+<li>أضف README صغير يشرح إزاي تشغّل المشروع من الصفر.</li>
+</ol>
+</section>
+
+<section>
+<h2>7. ملخص سريع: "المشروع وصل فين؟"</h2>
+<table>
+<tr><th>الجزئية</th><th>الحالة</th><th>ملاحظة</th></tr>
+<tr><td>هيكل المشروع</td><td><span class="badge b-ok">جاهز</span></td><td>تقسيمة ممتازة</td></tr>
+<tr><td>الـ prompt</td><td><span class="badge b-ok">جاهز</span></td><td>تعريفات + few-shot</td></tr>
+<tr><td>Structured schema</td><td><span class="badge b-ok">جاهز</span></td><td>pydantic + Literal</td></tr>
+<tr><td>Structured generator (outlines)</td><td><span class="badge b-warn">تجربة</span></td><td>بيحاول يتغلف، بس ممكن ما يشتغلش مع كل إصدار</td></tr>
+<tr><td>Inference من الصفر</td><td><span class="badge b-ok">موجود</span></td><td>generate.py / decoder.py</td></tr>
+<tr><td>التقييم (evaluator + metrics)</td><td><span class="badge b-ok">جاهز</span></td><td>لكن مفيش tests حقيقية</td></tr>
+<tr><td>الـ LLM abstraction (LLM/)</td><td><span class="badge b-bad">مكسور</span></td><td>imports + Model.py فاضي</td></tr>
+<tr><td>الداتا</td><td><span class="badge b-warn">صغيرة</span></td><td>10 صفوف بس</td></tr>
+<tr><td>Tests</td><td><span class="badge b-warn">شبه فاضي</span></td><td>مفيش pytest حقيقي</td></tr>
+<tr><td>التوثيق</td><td><span class="badge b-ok">ممتاز</span></td><td>PROJECT_LEARNING_GUIDE.md</td></tr>
+</table>
+<p style="margin-top:15px">📌 <b>الخلاصة:</b> المشروع واقف عند مرحلة "النموذج الأولي التعليمي" — الفكرة والهيكل والتقييم جاهزين، بس فيه لمسات صغيرة (imports + env + tests + بيانات أكتر) محتاجين تعديل عشان يبقى فعلاً شغال end-to-end.</p>
+</section>
+
+</main>
+<footer style="text-align:center;padding:20px;color:#64748b">خريطة المشروع — تم إنشاؤها 5 أكتوبر 2026</footer>
+</body>
+</html>
