@@ -35,14 +35,14 @@ with st.sidebar:
     selected_model = st.selectbox(
         "Select Language Model:",
         [
-            "llama-3.3-70b-versatile",
-            "mixtral-8x7b-32768",
-            "llama3-70b-8192",
-            "llama3-8b-8192"
+            "qwen/qwen3.8-27b",
+            "openai/gpt-oss-20b",
+            "openai/gpt-oss-120b",
+            "allam-2-7b"
         ],
         index=0
     )
-    st.info(f"Target API: **Groq Cloud**\nModel: `{selected_model}`")
+    st.info(f"Target API: **Groq Cloud**\nActive Model: `{selected_model}`")
 
 # ---------------------------------------------------------------------------
 # Input Form
