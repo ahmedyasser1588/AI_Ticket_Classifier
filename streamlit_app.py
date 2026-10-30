@@ -15,11 +15,10 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------------------------
-# API Credentials — Read from Streamlit Secrets or Environment
+# API Credentials
 # ---------------------------------------------------------------------------
 api_key = st.secrets.get("LLM_api_key", os.getenv("LLM_api_key", ""))
 base_url = st.secrets.get("LLM_base_url", os.getenv("LLM_base_url", "https://api.groq.com/openai/v1"))
-model = st.secrets.get("LLM_Model", os.getenv("LLM_Model", "llama-3.3-70b-versatile"))
 
 # ---------------------------------------------------------------------------
 # Header
@@ -27,6 +26,23 @@ model = st.secrets.get("LLM_Model", os.getenv("LLM_Model", "llama-3.3-70b-versat
 st.title("🎫 AutoTicket AI")
 st.caption("Intelligent Customer Support Triage & Structured Information Extraction")
 st.markdown("---")
+
+# ---------------------------------------------------------------------------
+# Model Selection (Allows user to pick active Groq models)
+# ---------------------------------------------------------------------------
+with st.sidebar:
+    st.header("⚙️ Model Configuration")
+    selected_model = st.selectbox(
+        "Select Language Model:",
+        [
+            "llama-3.3-70b-versatile",
+            "mixtral-8x7b-32768",
+            "llama3-70b-8192",
+            "llama3-8b-8192"
+        ],
+        index=0
+    )
+    st.info(f"Target API: **Groq Cloud**\nModel: `{selected_model}`")
 
 # ---------------------------------------------------------------------------
 # Input Form
@@ -47,9 +63,7 @@ if selected_example != "Select an example...":
 
 ticket_text = st.text_area("📩 Customer Support Ticket:", value=initial_text, height=130, placeholder="Type or paste a customer message here...")
 
-col1, col2 = st.columns([1, 4])
-with col1:
-    classify_btn = st.button("✨ Classify Ticket", type="primary", use_container_width=True)
+classify_btn = st.button("✨ Classify Ticket", type="primary", use_container_width=True)
 
 # ---------------------------------------------------------------------------
 # Inference & Display
@@ -58,7 +72,7 @@ if classify_btn:
     if not ticket_text.strip():
         st.warning("Please enter a ticket message first.")
     elif not api_key:
-        st.error("API Key not found. Please set LLM_api_key in Secrets or .env.")
+        st.error("API Key not found. Please set LLM_api_key in Secrets.")
     else:
         with st.spinner("Analyzing and extracting structured data..."):
             try:
@@ -66,7 +80,7 @@ if classify_btn:
                 client = OpenAI(api_key=api_key, base_url=base_url)
                 
                 response = client.chat.completions.create(
-                    model=model,
+                    model=selected_model,
                     messages=[
                         {
                             "role": "system",
@@ -126,4 +140,4 @@ if classify_btn:
                 st.error(f"Error during classification: {e}")
 
 st.markdown("---")
-st.caption("AutoTicket AI • Developed by Ahmed Yasser • Powered by Groq & Llama 3.1")
+st.caption("AutoTicket AI • Developed by Ahmed Yasser • Powered by Groq Cloud")

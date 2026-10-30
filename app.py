@@ -32,7 +32,7 @@ except ImportError:
 
 API_KEY  = os.getenv("LLM_api_key", "")
 BASE_URL = os.getenv("LLM_base_url", "https://api.groq.com/openai/v1")
-MODEL    = os.getenv("LLM_Model",    "llama-3.3-70b-versatile")
+MODEL    = "llama-3.3-70b-versatile"
 
 # ---------------------------------------------------------------------------
 # Core Classification Logic
